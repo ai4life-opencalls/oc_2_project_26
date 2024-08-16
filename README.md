@@ -1,26 +1,27 @@
-# Project template
+# Correlation of Light and  Electron Microscopy Images
 
-## 
-Directory structure for a sample project
+Corresponds to AI4Life Project 26 with Jan van der Beek from the Utrecht Center for Molecular Medicine (Klumperman Group).The project aims to achieve an accurate automatic registration of light and electron microscopy images. The combination of multi-channel protein labeling through fluorescence microscopy with nm-scale ultrastructural morphology from electron microscopy can provide both molecular and ultrastructural information of endo-lysosomal alternations at high resolution.
 
-## Overview
+[Project description](https://biifsweden.github.io/projects/2024/08/16/AI4Life_OC2_2024_26/)
+
+[Download code](archive/refs/heads/main.zip)
+
+## Installation
+
+## Usage
+
+## Cite
 
 ```
-|- bin/              Binary files (.exe)
-|
-|- data/             Raw data, essentially all input files
-|  |- Dataset1/
-|
-|- doc/              Documentation for the project
-|
-|- results/          Examples of results
-|  |- Dataset1/
-|
-|- src/              All code needed to go from input files to final results
-|
-|- .gitignore        Sets which parts of the repository that should be git tracked
-|
-|- README.md         Project overview
-|
-|- LICENSE.md        License for the project (usually GPL v3.0)
+Author list (2024). Title. Zenodo. https://doi.org/... .
 ```
+
+## License
+
+[MIT](LICENSE)
+
+## Contact
+
+[SciLifeLab BioImage Informatics Facility (BIIF)](https://www.scilifelab.se/units/bioimage-informatics/)
+
+Developed by [Kristína Lidayová](mailto:kristina.lidayova@scilifelab.se)
