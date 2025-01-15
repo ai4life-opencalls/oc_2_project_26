@@ -1,4 +1,6 @@
+import numpy as np
 import pandas as pd
+import open3d as o3d
 import matplotlib.pyplot as plt
 import xml.etree.ElementTree as ET
 
@@ -40,7 +42,7 @@ def xml_to_dataframe(xml_file):
 
     return df
 
-def dataframe_to_xml(df, filename):
+def dataframe_to_xml(df, filename=None):
     # Create the root element
     root = ET.Element('root')
 
@@ -62,10 +64,39 @@ def dataframe_to_xml(df, filename):
         ET.SubElement(roi, 'c').text = '-1'
         
         position = ET.SubElement(roi, 'position')
-        ET.SubElement(position, 'pos_x').text = str(row['Position X'])
-        ET.SubElement(position, 'pos_y').text = str(row['Position Y'])
+        ET.SubElement(position, 'pos_x').text = str(row['pos_x'])
+        ET.SubElement(position, 'pos_y').text = str(row['pos_y'])
 
     # Create the XML tree and save to file
     tree = ET.ElementTree(root)
-    tree.write(filename, encoding='utf-8', xml_declaration=True)
+    if filename is not None:
+        tree.write(filename, encoding='utf-8', xml_declaration=True)
 
+def list_to_dataframe(coordinates, filename=None):
+
+    # Create a DataFrame
+    df = pd.DataFrame(coordinates, columns=['pos_x', 'pos_y'])
+
+    # Add 'id' and 'name' columns
+    df['id'] = range(1, len(df) + 1)
+    df['name'] = "'Point2D'"
+    df = df[['id', 'name', 'pos_x', 'pos_y']]
+
+    if filename is not None:
+        df.to_csv(filename, index=False)
+    return df
+
+def dataframe_to_nparray(df):
+    return df[['pos_x', 'pos_y']].values
+
+def dataframe_to_pointcloud(df, filename=None):
+    points2D = df[['pos_x', 'pos_y']].values
+    points3D = np.hstack((points2D, np.zeros((len(points2D), 1))))
+
+    # Convert NumPy array to Open3D PointCloud
+    points_pcd = o3d.geometry.PointCloud()
+    points_pcd.points = o3d.utility.Vector3dVector(points3D)
+    
+    if filename is not None:
+        o3d.io.write_point_cloud(filename, points_pcd)
+    return points_pcd
