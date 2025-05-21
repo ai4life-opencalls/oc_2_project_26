@@ -1,3 +1,4 @@
+import csv
 import numpy as np
 import pandas as pd
 import open3d as o3d
@@ -19,7 +20,6 @@ def plot_image(image, size=40):
     fig = plt.figure(figsize=(size, size))
     ax1 = plt.subplot(1, 1, 1) 
     ax1.imshow(image, cmap='gray')  
-    
 
 def xml_to_dataframe(xml_file):
     # Parse the XML file
@@ -52,7 +52,7 @@ def xml_to_dataframe(xml_file):
 
     return df
 
-def dataframe_to_xml(df, filename=None):
+def dataframe_to_xml(df, filename=None, scale=[1, 1]):
     # Create the root element
     root = ET.Element('root')
 
@@ -74,15 +74,15 @@ def dataframe_to_xml(df, filename=None):
         ET.SubElement(roi, 'c').text = '-1'
         
         position = ET.SubElement(roi, 'position')
-        ET.SubElement(position, 'pos_x').text = str(row['pos_y'])
-        ET.SubElement(position, 'pos_y').text = str(row['pos_x'])
+        ET.SubElement(position, 'pos_x').text = str(row['pos_x']*scale[0])
+        ET.SubElement(position, 'pos_y').text = str(row['pos_y']*scale[1])
 
     # Create the XML tree and save to file
     tree = ET.ElementTree(root)
     if filename is not None:
         tree.write(filename, encoding='utf-8', xml_declaration=True)
 
-def dataframe_to_xml_(df, filename=None):
+def dataframe_to_xml_(df, filename=None, scale=[1, 1]):
     # Create the root element
     root = ET.Element('root')
 
@@ -104,8 +104,8 @@ def dataframe_to_xml_(df, filename=None):
         ET.SubElement(roi, 'c').text = '-1'
         
         position = ET.SubElement(roi, 'position')
-        ET.SubElement(position, 'pos_x').text = str(row['pos_x'])
-        ET.SubElement(position, 'pos_y').text = str(row['pos_y'])
+        ET.SubElement(position, 'pos_x').text = str(row['pos_x']*scale[0])
+        ET.SubElement(position, 'pos_y').text = str(row['pos_y']*scale[1])
 
     # Create the XML tree and save to file
     tree = ET.ElementTree(root)
@@ -115,7 +115,7 @@ def dataframe_to_xml_(df, filename=None):
 def list_to_dataframe(coordinates, filename=None):
 
     # Create a DataFrame
-    df = pd.DataFrame(coordinates, columns=['pos_x', 'pos_y'])
+    df = pd.DataFrame(coordinates, columns=['pos_y', 'pos_x'])
 
     # Add 'id' and 'name' columns
     df['id'] = range(1, len(df) + 1)
@@ -126,11 +126,11 @@ def list_to_dataframe(coordinates, filename=None):
         df.to_csv(filename, index=False)
     return df
 
-def dataframe_to_nparray(df):
-    return df[['pos_x', 'pos_y']].values
+def dataframe_to_nparray(df, scale=[1, 1]):
+    return(df[['pos_x', 'pos_y']].values * scale).astype(int)
 
-def dataframe_to_pointcloud(df, filename=None):
-    points2D = df[['pos_x', 'pos_y']].values
+def dataframe_to_pointcloud(df, filename=None, scale=[1, 1]):
+    points2D = (df[['pos_x', 'pos_y']].values * scale).astype(int)
     points3D = np.hstack((points2D, np.zeros((len(points2D), 1))))
 
     # Convert NumPy array to Open3D PointCloud
@@ -140,3 +140,15 @@ def dataframe_to_pointcloud(df, filename=None):
     if filename is not None:
         o3d.io.write_point_cloud(filename, points_pcd)
     return points_pcd
+
+def dataframe_to_csv(df, filename=None, scale=[1, 1]):
+    
+    # Open a new CSV file in write mode
+    with open(filename, 'w', newline='') as csvfile:
+    # Create a CSV writer object
+        csv_writer = csv.writer(csvfile)
+    
+    # Write the coordinates
+        for coord in (df[['pos_x', 'pos_y']].values * scale).astype(int):
+            csv_writer.writerow(coord)
+
