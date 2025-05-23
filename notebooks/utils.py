@@ -130,7 +130,7 @@ def dataframe_to_nparray(df, scale=[1, 1]):
     return(df[['pos_x', 'pos_y']].values * scale).astype(int)
 
 def dataframe_to_pointcloud(df, filename=None, scale=[1, 1]):
-    points2D = (df[['pos_x', 'pos_y']].values * scale).astype(int)
+    points2D = (df[['pos_x', 'pos_y']].to_numpy() * scale).astype(int)
     points3D = np.hstack((points2D, np.zeros((len(points2D), 1))))
 
     # Convert NumPy array to Open3D PointCloud
@@ -152,3 +152,95 @@ def dataframe_to_csv(df, filename=None, scale=[1, 1]):
         for coord in (df[['pos_x', 'pos_y']].values * scale).astype(int):
             csv_writer.writerow(coord)
 
+# Visualize results
+def visualize_result_nparray(source, target, result, title):
+    source_cloud = o3d.geometry.PointCloud()
+    source_cloud.points = o3d.utility.Vector3dVector(source)
+    source_cloud.paint_uniform_color([1, 0, 0])  # Red
+
+    target_cloud = o3d.geometry.PointCloud()
+    target_cloud.points = o3d.utility.Vector3dVector(target)
+    target_cloud.paint_uniform_color([0, 1, 0])  # Green
+
+    result_cloud = o3d.geometry.PointCloud()
+    result_cloud.points = o3d.utility.Vector3dVector(result)
+    result_cloud.paint_uniform_color([0, 0, 1])  # Blue
+
+    o3d.visualization.draw_geometries([source_cloud, target_cloud, result_cloud], window_name=title)
+
+def visualize_result_pcd(source, target, result, title):
+    source.paint_uniform_color([1, 0, 0])  # Red
+    target.paint_uniform_color([0, 1, 0])  # Green
+    result.paint_uniform_color([0, 0, 1])  # Blue
+    o3d.visualization.draw_geometries([source, target, result], window_name=title)
+
+# Print transformations
+def print_transformations(transformation_paramters, title):
+    print(title)
+    print(transformation_paramters.rot)  # Rotation matrix
+    print(transformation_paramters.t)    # Translation vector
+    print(transformation_paramters.scale)  # Scale factor
+
+    # Evaluate alignment using chamfer distance
+def chamfer_distance(A, B, title):
+    distances = np.min(np.sum((A[:, np.newaxis, :] - B[np.newaxis, :, :]) ** 2, axis=2), axis=1)
+    print(f"Chamfer distance = {np.mean(distances)} ({title}) ")
+
+    return np.mean(distances)
+
+def convert_to_pcd(nparray):
+    pcd = o3d.geometry.PointCloud()
+    pcd.points = o3d.utility.Vector3dVector(nparray)
+    return pcd
+
+def save_correspondences_in2df(source, target, correspondences):
+    # create empty dataframe
+    source_df = pd.DataFrame()
+    target_df = pd.DataFrame()
+
+    # add columns to the dataframe ['id', 'name', 'source_pos_x', 'source_pos_y', target_pos_x, target_pos_y] and the length of the dataframe is the number of correspondences
+    source_df['id'] = range(1, len(correspondences) + 1)
+    target_df['id'] = range(1, len(correspondences) + 1)
+    source_df['name'] = "'Point2D'"
+    target_df['name'] = "'Point2D'"
+    source_df['pos_x'] = source[correspondences[:, 0], 0]
+    source_df['pos_y'] = source[correspondences[:, 0], 1]
+    target_df['pos_x'] = target[correspondences[:, 1], 0]
+    target_df['pos_y'] = target[correspondences[:, 1], 1]
+    
+    return source_df, target_df
+
+
+def save_correspondences_in1df(source, target, correspondences):
+    # create empty dataframe
+    df = pd.DataFrame()
+
+    # add columns to the dataframe ['id', 'name', 'source_pos_x', 'source_pos_y', target_pos_x, target_pos_y] and the length of the dataframe is the number of correspondences
+    df['id'] = range(1, len(correspondences) + 1)
+    df['name'] = "'Point2D'"
+    df['source_pos_x'] = source[correspondences[:, 0], 0]
+    df['target_pos_x'] = target[correspondences[:, 1], 0]
+    df['source_pos_y'] = source[correspondences[:, 0], 1]
+    df['target_pos_y'] = target[correspondences[:, 1], 1]
+    df['source_ind'] = correspondences[:, 0]
+    df['target_ind'] = correspondences[:, 1]
+    df['distance'] = np.sqrt(np.sum((source[correspondences[:, 0]] - target[correspondences[:, 1]]) ** 2, axis=1))
+
+    return df
+
+def clean_correspondences(correspondences):
+    # Get unique target indices and their first occurrences
+    unique_target_indices, unique_indices = np.unique(correspondences[:, 1], return_index=True)
+
+    # Use the unique_indices to select the rows from the original array
+    cleaned_correspondences = correspondences[unique_indices]
+
+    return cleaned_correspondences
+
+def euclidean_distance(df1, df2):
+    dist = np.sqrt((df1['pos_x'] - df2['pos_x'])**2 + (df1['pos_y'] - df2['pos_y'])**2)
+    return dist
+
+def euclidean_distance(df):
+    dist = np.sqrt((df['source_pos_x'] - df['target_pos_x'])**2 + (df['source_pos_y'] - df['target_pos_y'])**2)
+    return dist
