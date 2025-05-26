@@ -12,14 +12,18 @@
 
 
 ---
-This repo was created by the [AI4Life project](https://ai4life.eurobioimaging.eu) using data provided by Jan van der Beek at Center for Molecular Medicine, Utrecht.
-All the images demonstrated in this tutorial are provided under **CC-BY** licence.
+This repository contains code for the automatic correlation of light microscopy (LM) and electron microscopy (EM) images. Developed as part of the [AI4Life project](https://ai4life.eurobioimaging.eu), it uses data provided by Jan van der Beek from the Center for Molecular Medicine, Utrecht.
+All images used in this tutorial are licensed under **CC-BY**. If any of the instructions are not working, please [open an issue](https://github.com/ai4life-opencalls/oc_2_project_26/issues) or contact us at [ai4life@fht.org](ai4life@fht.org)!
 
-If any of the instructions are not working, please [open an issue](https://github.com/ai4life-opencalls/oc_2_project_26/issues) or contact us at [ai4life@fht.org](ai4life@fht.org)!
+## Introduction
+The project focuses on accurately aligning LM and EM images to combine molecular and ultrastructural information for high-resolution analysis of endo-lysosomal alterations. LM provides multi-channel protein labeling through fluorescence microscopy, while EM offers nanoscale morphological details. Aligning these images enables comprehensive insights into cellular structures.
 
+Initially, image alignment relied on manually selecting points of interest and using ec-CLEM software to detect the correlation between them. This was a time-consuming and non-reproducible approach. This project instead aims to automate the process by detecting the reference features in both image modalities automatically.
 
-# Introduction
-The project aims to achieve an accurate automatic correlation of light and electron microscopy images. The combination of multi-channel protein labeling through fluorescence microscopy with nm-scale ultrastructural morphology from electron microscopy can provide both molecular and ultrastructural information of endo-lysosomal alternations at high resolution.
+Nuclei would be ideal reference features. They were relatively easy to detect in LM images using [CellPose](https://www.cellpose.org/), however, they were impossible to detect in EM images. Methods like [SAM](https://segment-anything.com/), [Micro-SAM](https://github.com/computational-cell-analytics/micro-sam), [ConvPaint](https://github.com/guiwitz/napari-convpaint), or traditional segmentation techniques did not yield good results for EM. As a solution, the team had to use fiducial particles as reference markers.
+
+The fiducial particles in the LM image were detected using the Big-FISH Python package for spot detection. Cooresponding spots in EM images were located using template matching. Then the Probreg package was used for point cloud registration and finally the LM image was warped based on the resulting displacement. This workflow enables robust, fully automatic registration of LM and EM images for integrated biological analysis.
+
 
 ## Installation
 Install the [conda](https://conda.io) package, dependency and environment manager.
