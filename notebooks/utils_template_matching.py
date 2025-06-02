@@ -139,3 +139,55 @@ def filter_the_template_matching_results(locs, image, size, out_size, in_size):
     locs2 = [loc for loc in locs if average_intensity_square_ring(image, loc, out_size, in_size) < thresh_square_ring]   # test 2
     locs3 = [loc for loc in locs1 if average_intensity_square_ring(image, loc, out_size, in_size) < thresh_square_ring]  # only if passed both tests
     return locs1, locs2, locs3
+
+def detect_regions(img_mask, min_area=0):
+    """
+    Detects regions in a binary mask image and returns their centroids and areas.
+    
+    Parameters:
+    img_mask (numpy.ndarray): Binary mask image.
+    min_area (int): Minimum area of the regions to be considered.
+    
+    Returns:
+    list: List of tuples containing the centroid coordinates and area of each region.
+    """
+    # Find connected components
+    _, labels = cv2.connectedComponents(img_mask)
+
+    # Calculate the centroid and area of each connected component
+    centroids = []
+    areas = []
+
+    for label in np.unique(labels):
+        if label == 0:             # skip the background
+            continue
+        
+        mask = np.zeros_like(img_mask, dtype=np.uint8)
+        mask[labels == label] = 1
+        
+        moments = cv2.moments(mask)
+
+        if moments["m00"] > min_area :   # equivalent to the area of 3 fiducial particles
+            centroids.append((int(moments["m10"] / moments["m00"]), int(moments["m01"] / moments["m00"])))
+            areas.append(int(moments["m00"]))
+
+    return centroids, areas
+
+def draw_red_circles(image_path, centroids):
+    """
+    Draws circles around the detected regions in the mask image.
+    
+    Parameters:
+    img_mask (numpy.ndarray): Binary mask image.
+    centroids (list): List of tuples containing the centroid coordinates of each region.
+    
+    Returns:
+    numpy.ndarray: Image with drawn regions.
+    """
+    img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+    img_color = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    
+    for centroid in centroids:
+        cv2.circle(img_color, centroid, 5, ( 0, 0, 255), -1)
+
+    return img_color
