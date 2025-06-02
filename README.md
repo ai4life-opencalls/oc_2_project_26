@@ -33,11 +33,6 @@ _Figure 2: Light microscopy image on the right, with individual channels shown o
 The fiducial particles in the LM image were detected using the Big-FISH Python package for spot detection. Corresponding spots in EM images were located using template matching. Then the Probreg package was used for point cloud registration and finally the LM image was warped based on the resulting displacement field. This workflow enables robust, fully automatic registration of LM and EM images for integrated biological analysis.
 
 
-
-
-
-
-
 ## Installation
 Install the [conda](https://conda.io) package, dependency and environment manager.
 
@@ -64,10 +59,20 @@ Then run [Jupyter Lab](https://jupyter.org) from within the `AI4Life_OC2_2024_26
 
 Inside the `notebooks` folder you will find Jupyter notebooks for:
 
-- Step 1. [Detecting the fiducial particles in EM images](notebooks/Detect_fiducial_particles_in_EM.ipynb)
-- Step 2. [Detecting the fiducial particles in LM images](notebooks/Detect_fiducial_particles_in_LM.ipynb)
-- Step 3. [Finding_correlation_between_EM_and_LM_images](notebooks/Finding_correlation_between_EM_and_LM_images.ipynb)
-  
+### Step 1 : [Detecting the fiducial particles in EM images](notebooks/Detect_fiducial_particles_in_EM.ipynb)
+
+  This notebook detects fiducial particles in electron microscopy (EM) images for use in CLEM workflows. The fiducial particles in EM image are characterized by bright rings with a dark center.
+The pipeline involves:
+
+1. **Fiducial particle detection**: Detection of fiducial particles is done using the template matching algorithm with an artificial template (dark-centered spot).
+2. **Cluster detection**: Filtering the set of individual fiducial particles by recognizing clusters of overlapping or closely located detections (≥3) and saving their centroids.
+3. **Results saving**: Saving the positions of all detected fiducial particles and the positions of fiducial clusters into various formats: .csv, .xml, and .ply for downstream analysis. 
+
+_Figure 3: Electron microscopy (EM) image with an enlarged cutout (left), the fiducial particle detection (result after step 1, middle), and the fiducial clusters detection (result after step 2, right)._
+
+![EM-FP_detection](https://github.com/user-attachments/assets/c674ea56-de9f-4846-929e-cf53ed7f637d)
+### Step 2 : [Detecting the fiducial particles in LM images](notebooks/Detect_fiducial_particles_in_LM.ipynb)
+### Step 3 : [Finding_correlation_between_EM_and_LM_images](notebooks/Finding_correlation_between_EM_and_LM_images.ipynb)
 
 ## Acknowledgements
 AI4Life has received funding from the European Union’s Horizon Europe research and innovation programme under grant agreement number 101057970. Views and opinions expressed are however those of the author(s) only and do not necessarily reflect those of the European Union or the European Research Council Executive Agency. Neither the European Union nor the granting authority can be held responsible for them.
