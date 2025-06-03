@@ -14,7 +14,7 @@ color_values = [ '-154', '-3611080', '-13210', '-16777088', '-16744193', '-11776
  '-16744384', '-10027162', '-16777216',  '-8388544', '-12582784',    '-36913', '-16711808',
   '-3355444',        '-1']
 
-def plot_image(image, size=40):    
+def plot_image(image, size=30):    
     """
     Plot a grayscale image in the original size - takes time
     """

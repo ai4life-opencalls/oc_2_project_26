@@ -40,7 +40,6 @@ def non_max_suppression(boxes, scores, threshold):
         
         # Update the indices
         sorted_indices = sorted_indices[keep_indices + 1]
-    print("Keep boxes: ", keep_boxes)
     return keep_boxes
 
 def template_matching(image, template, threshold):
@@ -120,25 +119,26 @@ def filter_the_template_matching_results(locs, image, size, out_size, in_size):
     thresh_middle = otsu_threshold_1d(intensities_middle, 70)
     thresh_square_ring = otsu_threshold_1d(intensities_square_ring, 70)
 
-    fig, axes = plt.subplots(1, 2, figsize=(15, 10), layout='constrained')
-    axes[0].hist(intensities_middle, bins=100, color='blue', edgecolor='black')
-    axes[0].set_title('Histogram of Intensities Middle')
-    axes[0].set_xlabel('Intensity')
-    axes[0].set_ylabel('Frequency')
+
+#    fig, axes = plt.subplots(1, 2, figsize=(15, 10), layout='constrained')
+#    axes[0].hist(intensities_middle, bins=100, color='blue', edgecolor='black')
+#    axes[0].set_title('Histogram of Intensities Middle')
+#    axes[0].set_xlabel('Intensity')
+#    axes[0].set_ylabel('Frequency')
 
     # Plot histogram for intensities_square_ring on the second subplot
-    axes[1].hist(intensities_square_ring, bins=100, color='green', edgecolor='black')
-    axes[1].set_title('Histogram of Intensities Square Ring')
-    axes[1].set_xlabel('Intensity')
-    axes[1].set_ylabel('Frequency')
+#    axes[1].hist(intensities_square_ring, bins=100, color='green', edgecolor='black')
+#    axes[1].set_title('Histogram of Intensities Square Ring')
+#    axes[1].set_xlabel('Intensity')
+#    axes[1].set_ylabel('Frequency')
 
-    print("Threshold middle: ", thresh_middle)
-    print("Threshold square ring: ", thresh_square_ring)
+#    print("Threshold middle: ", thresh_middle)
+#    print("Threshold square ring: ", thresh_square_ring)
 
     locs1 = [loc for loc in locs if average_intensity_square(image, loc, size) < thresh_middle]                # test 1
     locs2 = [loc for loc in locs if average_intensity_square_ring(image, loc, out_size, in_size) < thresh_square_ring]   # test 2
     locs3 = [loc for loc in locs1 if average_intensity_square_ring(image, loc, out_size, in_size) < thresh_square_ring]  # only if passed both tests
-    return locs1, locs2, locs3
+    return locs3
 
 def detect_regions(img_mask, min_area=0):
     """
@@ -188,6 +188,6 @@ def draw_red_circles(image_path, centroids):
     img_color = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
     
     for centroid in centroids:
-        cv2.circle(img_color, centroid, 5, ( 0, 0, 255), -1)
+        cv2.circle(img_color, centroid, 5, ( 255, 0, 0), -1)
 
     return img_color
