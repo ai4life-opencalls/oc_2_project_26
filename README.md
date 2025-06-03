@@ -1,4 +1,3 @@
-![EM_overlaid_by_LM](https://github.com/user-attachments/assets/f0962786-32c3-4e36-a122-2933b2ca4fb4)<p align="center">
   <a href="https://ai4life.eurobioimaging.eu/open-calls/">
     <img src="https://github.com/ai4life-opencalls/.github/blob/main/AI4Life_banner_giraffe_nodes_OC.png?raw=true" width="70%">
   </a>
