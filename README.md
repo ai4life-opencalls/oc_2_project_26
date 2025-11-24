@@ -6,8 +6,8 @@
 
 # Project #26: Ultrastructural protein mapping through Correlation of Light and Electron Microscopy
 
-
-<!-- [![DOI](https://zenodo.org/badge/DOI/)](https://doi.org/) -->
+[![DOI](https://zenodo.org/badge/843540661.svg)](https://doi.org/10.5281/zenodo.16087321)
+![Static Badge](https://img.shields.io/badge/Data_on_BIA-S--BIAD1799-blue?link=https%3A%2F%2Fwww.ebi.ac.uk%2Fbiostudies%2Fbioimages%2Fstudies%2FS-BIAD1799)
 
 
 ---
