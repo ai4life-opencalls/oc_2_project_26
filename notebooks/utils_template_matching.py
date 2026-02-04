@@ -98,46 +98,38 @@ def average_perimeter_intensity(image, center, radius):
     
     return average_intensity
 
-def average_intensity_square(image, middle, size):
+def average_intensity_square(image, middle, radius): 
+    """
+    Calculates average intensity in square area around 'middle' with radius 'radius'
+    """
     x, y = middle
-    square = image[y-size:y+size+1, x-size:x+size+1].copy()
+    square = image[y-radius:y+radius+1, x-radius:x+radius+1].copy()
     return np.mean(square)
 
-def average_intensity_square_ring(image, middle, out_size, in_size):
+def average_intensity_squared_donut(image, middle, out_radius, in_radius): 
+    """
+    Calculates average intensity in square area around 'middle' with outer radius 'out_radius' 
+    excluding the square are around 'middle with 'in_radius'
+    """
     x, y = middle
-    square = image[y-out_size:y+out_size+1, x-out_size:x+out_size+1].copy()
-    square[in_size:-in_size,in_size:-in_size]=0
+    square = image[y-out_radius:y+out_radius+1, x-out_radius:x+out_radius+1].copy() 
+    square[in_radius:-in_radius,in_radius:-in_radius]=0
     return np.average(square[square!=0])
 
-def filter_the_template_matching_results(locs, image, size, out_size, in_size):
+def filter_the_template_matching_results(locs, image, radius, out_radius, in_radius):
     intensities_middle = []
     intensities_square_ring = []
     for loc in locs:
-        intensities_middle.append(average_intensity_square(image, loc, size)) 
-        intensities_square_ring.append(average_intensity_square_ring(image, loc, out_size, in_size))
+        intensities_middle.append(average_intensity_square(image, loc, radius)) 
+        intensities_square_ring.append(average_intensity_squared_donut(image, loc, out_radius, in_radius))
 
-    thresh_middle = otsu_threshold_1d(intensities_middle, 70)
-    thresh_square_ring = otsu_threshold_1d(intensities_square_ring, 70)
+    thresh_middle = otsu_threshold_1d(intensities_middle, 70)  # calculates the best threshold value to separate true and false fiducials based on average instenistie in a square area around the middle
+    thresh_square_ring = otsu_threshold_1d(intensities_square_ring, 70)  # calculates the best threshold value to separate true and false fiducials based on average instenistie in a squared donut area around the middle
 
 
-#    fig, axes = plt.subplots(1, 2, figsize=(15, 10), layout='constrained')
-#    axes[0].hist(intensities_middle, bins=100, color='blue', edgecolor='black')
-#    axes[0].set_title('Histogram of Intensities Middle')
-#    axes[0].set_xlabel('Intensity')
-#    axes[0].set_ylabel('Frequency')
-
-    # Plot histogram for intensities_square_ring on the second subplot
-#    axes[1].hist(intensities_square_ring, bins=100, color='green', edgecolor='black')
-#    axes[1].set_title('Histogram of Intensities Square Ring')
-#    axes[1].set_xlabel('Intensity')
-#    axes[1].set_ylabel('Frequency')
-
-#    print("Threshold middle: ", thresh_middle)
-#    print("Threshold square ring: ", thresh_square_ring)
-
-    locs1 = [loc for loc in locs if average_intensity_square(image, loc, size) < thresh_middle]                # test 1
-    locs2 = [loc for loc in locs if average_intensity_square_ring(image, loc, out_size, in_size) < thresh_square_ring]   # test 2
-    locs3 = [loc for loc in locs1 if average_intensity_square_ring(image, loc, out_size, in_size) < thresh_square_ring]  # only if passed both tests
+    locs1 = [loc for loc in locs if average_intensity_square(image, loc, radius) < thresh_middle]                # test 1
+    locs2 = [loc for loc in locs if average_intensity_squared_donut(image, loc, out_radius, in_radius) < thresh_square_ring]   # test 2
+    locs3 = [loc for loc in locs1 if average_intensity_squared_donut(image, loc, out_radius, in_radius) < thresh_square_ring]  # only if passed both tests
     return locs3
 
 def detect_regions(img_mask, min_area=0):
